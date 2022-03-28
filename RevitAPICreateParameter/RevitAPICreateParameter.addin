@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>
+  <AddIn Type="Command">
+    <Assembly>"C:\Program Files\RevitAPITrainig\RevitAPICreateParameter.dll"</Assembly>
+    <AddInId>8A4C3B1E-561E-42BD-94DD-876A584E9467</AddInId>
+    <FullClassName>RevitAPICreateParameter.Main</FullClassName>
+    <VendorId>ADSK</VendorId>
+    <Text>Create Param</Text>
+  </AddIn>
+</RevitAddIns>
