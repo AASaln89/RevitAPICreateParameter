@@ -32,7 +32,6 @@ namespace RevitAPICreateParameter
             }
             IList<Reference> selectedElementsRefList = uidoc.Selection.PickObjects(ObjectType.Face, "Select elem");
             var elementList = new List<Element>();
-            double sum = 0;
             double stLength = 1.1;
             foreach (var selectedElement in selectedElementsRefList)
             {
@@ -43,16 +42,21 @@ namespace RevitAPICreateParameter
                     using (Transaction ts1 = new Transaction(doc, "set parameter"))
                     {
                         ts1.Start();
-                        var familyinstance = element as FamilyInstance;
-                        Parameter lengthParameter = familyinstance.GetParameter(BuiltInParameter.CURVE_ELEM_LENGTH);
-                        lengthParameter.AsDouble().ToString();
-                        sum += lengthParameter * stLength;
-                        lengthParameter.Set(sum);
+                        var familyinstance = element as MEPCurve;
+                        Parameter lengthParameter = familyinstance.LookupParameter("Длина с запасом");
+                        Parameter parameter1 = element.LookupParameter("Length");
+                        if (parameter1.StorageType==StorageType.Double)
+                        {
+                            double param1 = UnitUtils.ConvertFromInternalUnits(parameter1.AsDouble(), UnitTypeId.CubicMeters);
+                            double cef = param1 * stLength;
+                            cef.ToString();
+                            lengthParameter.Set(cef);
+                        }
                         ts1.Commit();
                     }
                 }
             }
-            TaskDialog.Show("Сообщение", sum.ToString());
+            //TaskDialog.Show("Сообщение",.ToString());
             return Result.Succeeded;
         }
 
