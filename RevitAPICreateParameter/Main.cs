@@ -30,7 +30,7 @@ namespace RevitAPICreateParameter
                 CreateSharedParameter(uiapp.Application, doc, "Длина с запасом", categorySet, BuiltInParameterGroup.PG_LENGTH, true);
                 ts.Commit();
             }
-            IList<Reference> selectedElementsRefList = uidoc.Selection.PickObjects(ObjectType.Face, "Select elem");
+            IList<Reference> selectedElementsRefList = uidoc.Selection.PickObjects(ObjectType.Element, "Select elem");
             var elementList = new List<Element>();
             double stLength = 1.1;
             foreach (var selectedElement in selectedElementsRefList)
@@ -42,16 +42,11 @@ namespace RevitAPICreateParameter
                     using (Transaction ts1 = new Transaction(doc, "set parameter"))
                     {
                         ts1.Start();
-                        var familyinstance = element as MEPCurve;
-                        Parameter lengthParameter = familyinstance.LookupParameter("Длина с запасом");
-                        Parameter parameter1 = element.LookupParameter("Length");
-                        if (parameter1.StorageType==StorageType.Double)
-                        {
-                            double param1 = UnitUtils.ConvertFromInternalUnits(parameter1.AsDouble(), UnitTypeId.CubicMeters);
-                            double cef = param1 * stLength;
-                            cef.ToString();
-                            lengthParameter.Set(cef);
-                        }
+                        var familyinstance = element as FamilyInstance;
+                        Parameter lengthParameter = familyinstance.get_Parameter(BuiltInParameter.CURVE_ELEM_LENGTH);
+                            double cef = lengthParameter.AsDouble() * stLength;
+                        Parameter marginLEngthPrameter = familyinstance.LookupParameter("Длина с запасом");
+                        marginLEngthPrameter.Set(UnitUtils.ConvertToInternalUnits(cef, UnitTypeId.Meters));
                         ts1.Commit();
                     }
                 }
